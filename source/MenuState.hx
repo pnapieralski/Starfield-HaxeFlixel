@@ -61,13 +61,11 @@ class StarField extends FlxObject {
 			var str:FlxSprite = _stars.members[i];
 			
 			// cast point velocity to vector velocity for rotation computation
-			var starVelVector:FlxVector = cast(str.velocity, FlxVector); 
+			var starVelVector:FlxVector = new FlxVector(str.velocity.x, str.velocity.y);
 					
 			starVelVector.rotateByDegrees(howMuch);
 			
 			str.velocity = cast(starVelVector, FlxPoint);
-			
-			//FlxU.rotatePoint(str.velocity.x, str.velocity.y, 0, 0, howMuch, str.velocity);
 		}
 	}
 	 
@@ -98,17 +96,34 @@ class StarField extends FlxObject {
  */
 class MenuState extends FlxState
 {	
+	// state
+	// 0 = stopped
+	// 1 = rotate CW
+	// -1 = rotate CCW
+	private var state:UInt = 1;
+	private var angle:Float = 0;
+	private var starField:StarField;
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
 	override public function create():Void
 	{
-		add(new StarField());
+		starField = new StarField(angle);
+		add(starField);
 		
-		var title = new FlxText(0, 0, FlxG.width, "Yay Starfield in HAXE-FLIXEL");
+		var title = new FlxText(0, 0, FlxG.width, "HaxeFlixel");
 		title.setFormat(null, 42, 0xeeeeee, "center");
 
 		add(title);
+		
+		var butStop = new FlxButton(10, 10, "Stop rotation", function() { state = 0; } );
+		add(butStop);
+		
+		var butRotateCCW = new FlxButton(10, 50, "Rotate CCW", function() { state = -1; } );
+		add(butRotateCCW);
+		
+		var butRotateCW = new FlxButton(10, 90, "Rotate CW", function() { state = 1; } );
+		add(butRotateCW);
 		
 		super.create();
 	}
@@ -128,5 +143,7 @@ class MenuState extends FlxState
 	override public function update():Void
 	{
 		super.update();
+		starField.rotate(angle);
+		angle += 0.001*state;
 	}	
 }
