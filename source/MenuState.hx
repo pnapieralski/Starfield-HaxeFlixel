@@ -51,8 +51,10 @@ class StarField extends FlxObject {
 	 * @param   howMuch Input the amount of rotation in degrees
 	 */
 	public function rotate(howMuch:Float = 1):Void {
+		// Change sprite graphic angle
 		angle += howMuch;
 		 
+		// Change movement angle (using the accumulated angle)
 		var radang:Float = angle * Math.PI / 180.0;
 		var cosang:Float = Math.cos(radang);
 		var sinang:Float = Math.sin(radang);
@@ -60,12 +62,11 @@ class StarField extends FlxObject {
 		for (i in 0...NUM_STARS) {
 			var str:FlxSprite = _stars.members[i];
 			
-			// cast point velocity to vector velocity for rotation computation
-			var starVelVector:FlxVector = new FlxVector(str.velocity.x, str.velocity.y);
-					
-			starVelVector.rotateByDegrees(howMuch);
+			var vel:Float = Math.sqrt(str.velocity.x * str.velocity.x + str.velocity.y * str.velocity.y);
 			
-			str.velocity = cast(starVelVector, FlxPoint);
+			// start moving in new direction
+			str.velocity.x = cosang * vel;
+			str.velocity.y = sinang * vel;
 		}
 	}
 	 
@@ -101,14 +102,13 @@ class MenuState extends FlxState
 	// 1 = rotate CW
 	// -1 = rotate CCW
 	private var state:UInt = 1;
-	private var angle:Float = 0;
 	private var starField:StarField;
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
 	override public function create():Void
 	{
-		starField = new StarField(angle);
+		starField = new StarField(45);
 		add(starField);
 		
 		var title = new FlxText(0, 0, FlxG.width, "HaxeFlixel");
@@ -143,7 +143,6 @@ class MenuState extends FlxState
 	override public function update():Void
 	{
 		super.update();
-		starField.rotate(angle);
-		angle += 0.001*state;
+		starField.rotate(state);
 	}	
 }
