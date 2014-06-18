@@ -51,22 +51,13 @@ class StarField extends FlxObject {
 	 * @param   howMuch Input the amount of rotation in degrees
 	 */
 	public function rotate(howMuch:Float = 1):Void {
-		// Change sprite graphic angle
-		angle += howMuch;
-		 
-		// Change movement angle (using the accumulated angle)
-		var radang:Float = angle * Math.PI / 180.0;
-		var cosang:Float = Math.cos(radang);
-		var sinang:Float = Math.sin(radang);
-		 
 		for (i in 0...NUM_STARS) {
 			var str:FlxSprite = _stars.members[i];
+			var velVector:FlxVector = new FlxVector(str.velocity.x, str.velocity.y);
 			
-			var vel:Float = Math.sqrt(str.velocity.x * str.velocity.x + str.velocity.y * str.velocity.y);
-			
-			// start moving in new direction
-			str.velocity.x = cosang * vel;
-			str.velocity.y = sinang * vel;
+			velVector.rotateByDegrees(howMuch);
+		
+			str.velocity = velVector;
 		}
 	}
 	 
@@ -143,6 +134,6 @@ class MenuState extends FlxState
 	override public function update():Void
 	{
 		super.update();
-		starField.rotate(state);
+		starField.rotate(cast(state,Float));
 	}	
 }
